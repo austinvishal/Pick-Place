@@ -1,0 +1,54 @@
+edit pickandplace
+tool succion.pad
+succionpad.start=5; set output 5
+positionp1=1004; P1 location
+conveyor.start=1 ;output port for conveyor
+control.conveyor=2 ;output port for conveyor direction
+detector.right=1008 ; Detector right input
+detector.left=1007 ; Detector left input 
+signal(succionpad.start)
+wait sig(1004)and sig(1005)
+if sig(positionp1) then       ;set signal5 as high
+    appro P1,50
+    moves P1 
+    closei
+    departs 50
+else 
+    appro P2,50
+    moves P2 
+    closei
+    departs 50
+end
+appro place,50
+moves place      ; move to location place in straight line
+openi
+departs 50 
+move wait.loc
+break 
+
+signal(control.conveyor)   ;for direction 
+signal(conveyor.start)     ;for enabling the motion
+wait sig(detector.right)     ;to cross the detector
+signal(-conveyor.start)     ;stop the conveyor
+
+timer 1=0
+wait timer(1)>2
+
+signal(-control.conveyor)   ;reverse the direction of conveyor
+signal(conveyor.start)     ;enable the conveyor motion
+wait sig(detector.left)      ;to cross the left detector
+signal(-conveyor.start)     ;stop the conveyor
+
+appro grasp.loc.stopped,50      
+moves grasp.loc.stopped      ;move to location and place at P3
+closei
+departs 50
+appro P3,50
+move P3
+openi
+departs 50
+move wait.loc
+
+e
+load pickconv.lc
+load alltools.v2
